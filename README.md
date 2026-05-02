@@ -1,20 +1,25 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🧩 Fifteen Puzzle
 
-# Run and deploy your AI Studio app
+A high-performance, browser-based sliding puzzle game built with pure JavaScript and CSS. Experience a satisfying, tactile feel with custom image support, adjustable grid sizes, and relaxing sound effects.
 
-This contains everything you need to run your app locally.
+![Status](https://img.shields.io/badge/Status-Live-brightgreen)
+![Tech](https://img.shields.io/badge/Built%20With-JavaScript%20%2F%20Vite-yellow)
 
-View your app in AI Studio: https://ai.studio/apps/6136ec6d-3c75-4481-af94-84bf0a0b1ba8
+## ✨ Features
 
-## Run Locally
+- **🖼️ Custom Images**: Upload your own photos to create unique puzzles.
+- **⚙️ Dynamic Grid**: Choose any board size from 2x2 up to 10x10.
+- **🎧 Satisfying Audio**: Hand-crafted "muted pop" sound effects using the Web Audio API for a relaxing experience.
+- **🔢 Number Hints**: Toggleable number badges to help you solve complex puzzles.
+- **📱 Responsive Design**: Plays beautifully on both desktop and mobile devices.
+- **🎯 Precise Controls**: Smooth animations and reliable touch/click detection.
 
-**Prerequisites:**  Node.js
+## 🚀 Quick Start
 
+### Local Development
+To run this project locally:
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/fifteen-puzzle.git
+   cd fifteen-puzzle
