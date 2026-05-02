@@ -11,41 +11,27 @@
     let o;
     let f = document.getElementById("fifteen");
 
-    // Enhanced Satisfying Sound Engine
+    // Satisfying "Muted Pop" Sound Engine
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playClickSound() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         
         const now = audioCtx.currentTime;
-        const masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0.3, now);
-        masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-        masterGain.connect(audioCtx.destination);
+        const gain = audioCtx.createGain();
+        const osc = audioCtx.createOscillator();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(55, now + 0.06);
+        
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
 
-        // Soft Resonance (Wooden tone)
-        const body = audioCtx.createOscillator();
-        body.type = 'sine';
-        body.frequency.setValueAtTime(174.61, now); // F3
-        body.frequency.exponentialRampToValueAtTime(140, now + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
         
-        // Gentle "attack" click
-        const click = audioCtx.createOscillator();
-        click.type = 'triangle';
-        click.frequency.setValueAtTime(800, now);
-        click.frequency.exponentialRampToValueAtTime(400, now + 0.02);
-        
-        const clickGain = audioCtx.createGain();
-        clickGain.gain.setValueAtTime(0.08, now);
-        clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-        
-        body.connect(masterGain);
-        click.connect(clickGain);
-        clickGain.connect(masterGain);
-        
-        body.start(now);
-        click.start(now);
-        body.stop(now + 0.12);
-        click.stop(now + 0.02);
+        osc.start(now);
+        osc.stop(now + 0.05);
     }
 
     function ceation_slots() {
@@ -91,7 +77,6 @@
                     if (tag) {
                         const span = document.createElement('div');
                         span.className = 'num-badge';
-                        span.style.cssText = "background: white; color: black; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; pointer-events: none; font-size: 14px; font-weight: 900; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.4); font-family: system-ui, -apple-system, sans-serif; position: relative; z-index: 5;";
                         span.innerText = tag;
                         s.appendChild(span);
                     }
@@ -118,7 +103,7 @@
                     })(o));
                     
                     if (p.number) {
-                        e.innerHTML = "<div class='num-badge' style='background: white; color: black; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; pointer-events: none; font-size: 14px; font-weight: 900; border: 2px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.4); font-family: system-ui, -apple-system, sans-serif; position: relative; z-index: 5;'>" + o + "</div>";
+                        e.innerHTML = "<div class='num-badge'>" + o + "</div>";
                     }
                     e.setAttribute('data-id', o);
 
@@ -330,7 +315,7 @@
         let parent = f.parentNode;
         let rect = parent.getBoundingClientRect();
         
-        let padding = (window.innerWidth < 768) ? 20 : 64; 
+        let padding = (window.innerWidth < 768) ? 24 : 64; 
         let availableWidth = rect.width - padding;
         let availableHeight = rect.height - padding;
         

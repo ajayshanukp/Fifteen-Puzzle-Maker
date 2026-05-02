@@ -207,6 +207,25 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
+        .num-badge {
+            background: white;
+            color: black;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            font-size: 14px;
+            font-weight: 900;
+            border: 2px solid #000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            font-family: system-ui, -apple-system, sans-serif;
+            position: relative;
+            z-index: 5;
+        }
+
         @keyframes popIn {
             from { opacity: 0; transform: scale(0.85); }
             to { opacity: 1; transform: scale(1); }
@@ -315,11 +334,11 @@
             <div style="display:flex; gap:10px;">
                 <div style="flex:1">
                     <span style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:4px;">Columns</span>
-                    <input type="number" id="grid_w" value="3" min="2" max="12">
+                    <input type="number" id="grid_w" value="3" min="2" max="10">
                 </div>
                 <div style="flex:1">
                     <span style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:4px;">Rows</span>
-                    <input type="number" id="grid_h" value="4" min="2" max="15">
+                    <input type="number" id="grid_h" value="4" min="2" max="10">
                 </div>
             </div>
         </div>
@@ -356,7 +375,7 @@
             </div>
         </div>
         
-        <button id="menu-btn" onclick="toggleSidebar()" style="position: fixed; top: 20px; left: 20px; z-index: 50; width: 52px; height: 52px; border-radius: 16px; background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.25); cursor: pointer; transition: all 0.2s;">
+        <button id="menu-btn" onclick="toggleSidebar()" style="position: fixed; top: 20px; left: 20px; z-index: 999; width: 52px; height: 52px; border-radius: 16px; background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.25); cursor: pointer; transition: all 0.2s;">
             <svg style="width:28px;height:28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
         </button>
 
@@ -390,17 +409,24 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const menuBtn = document.getElementById('menu-btn');
             const isOpen = sidebar.classList.toggle('open');
+            updateMenuButtonVisibility(isOpen);
+        }
+
+        function updateMenuButtonVisibility(isOpen) {
+            const menuBtn = document.getElementById('menu-btn');
             if (menuBtn) {
                 menuBtn.style.opacity = isOpen ? '0' : '1';
                 menuBtn.style.pointerEvents = isOpen ? 'none' : 'all';
+                menuBtn.style.visibility = isOpen ? 'hidden' : 'visible';
             }
         }
 
         function closeSidebarOnMobile() {
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                updateMenuButtonVisibility(false);
             }
         }
         const fileInput = document.getElementById('file-input');
@@ -475,11 +501,19 @@
 
         function refreshPuzzle() {
             // Collect UI values
+            const gwEl = document.getElementById('grid_w');
+            const ghEl = document.getElementById('grid_h');
+            
+            // Limit to 10 max
+            let cols = Math.max(2, Math.min(10, parseInt(gwEl.value) || 3));
+            let rows = Math.max(2, Math.min(10, parseInt(ghEl.value) || 4));
+            
+            // Update UI to reflect clamped values
+            gwEl.value = cols;
+            ghEl.value = rows;
+
             setup.puzzle_fifteen.diff = parseInt(document.getElementById('diff').value);
-            setup.puzzle_fifteen.grid = [
-                parseInt(document.getElementById('grid_w').value),
-                parseInt(document.getElementById('grid_h').value)
-            ];
+            setup.puzzle_fifteen.grid = [cols, rows];
             setup.puzzle_fifteen.number = document.getElementById('number').checked;
             setup.puzzle_fifteen.time = parseFloat(document.getElementById('time').value) || 0.4;
             
