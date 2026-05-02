@@ -16,11 +16,3 @@ A high-performance, browser-based sliding puzzle game built with pure JavaScript
 - **📱 Responsive Design**: Plays beautifully on both desktop and mobile devices.
 - **🎯 Precise Controls**: Smooth animations and reliable touch/click detection.
 
-## 🚀 Quick Start
-
-### Local Development
-To run this project locally:
-
-1. **Clone the repository**
-   ```bash
-     https://github.com/ajayshanukp
