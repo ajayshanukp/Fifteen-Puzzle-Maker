@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifteen Puzzle Maker</title>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --accent-color: #cbd5e1;
+            --sidebar-bg: #1e293b;
+            --text-color: #334155;
+            --primary-color: #3b82f6;
+            --btn-text: #ffffff;
+            --border-radius: 12px;
+            --input-radius: 8px;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            overflow-y: auto;
+            padding: 24px;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        #sidebar h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #fff;
+            text-transform: none;
+            letter-spacing: -0.025em;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+        }
+
+        .control-group input[type="text"],
+        .control-group input[type="number"],
+        .control-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--input-radius);
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            text-align: center;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 12px;
+        }
+
+        .button:hover {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+        .button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .button-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .button-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .switch-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .switch-group:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .switch-group label {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+
+        /* Main Content */
+        #main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+
+        #fifteen {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .status-bar {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 16px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 99px;
+            border: 1px solid rgba(0,0,0,0.1);
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: -270px;
+                top: 0;
+                bottom: 0;
+                width: 260px;
+                transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                box-shadow: 20px 0 50px rgba(0,0,0,0.4);
+            }
+
+            #sidebar.open {
+                left: 0;
+            }
+            
+            .status-bar {
+                bottom: 16px;
+                font-size: 9px;
+                padding: 6px 12px;
+            }
+        }
+
+        #menu-btn:hover {
+            transform: scale(1.05);
+            background: #334155;
+        }
+
+        #menu-btn:active {
+            transform: scale(0.95);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .win-reveal {
+            animation: winGlow 2s infinite alternate;
+        }
+
+        @keyframes winGlow {
+            from { filter: brightness(1) drop-shadow(0 0 0px var(--primary-color)); }
+            to { filter: brightness(1.1) drop-shadow(0 0 20px var(--primary-color)); }
+        }
+    </style>
+</head>
+<body>
+
+
+    <div id="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 16px;">
+            <h2 style="margin:0; border:none; padding:0;">Puzzle Setup</h2>
+            <button onclick="toggleSidebar()" style="background:none; border:none; color:white; cursor:pointer; padding:4px;">
+                <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            </button>
+        </div>
+        
+        <div class="control-group">
+            <label>1. Pick a Photo</label>
+            <button class="button button-primary" onclick="document.getElementById('file-input').click()">
+                <svg style="width:16px;height:16px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Upload Image
+            </button>
+            <input type="file" id="file-input" accept="image/*" style="display:none;">
+        </div>
+
+        <div class="control-group">
+            <label>2. Difficulty</label>
+            <input type="range" id="diff" min="20" max="600" value="200" style="width:100%; accent-color: var(--primary-color);">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:rgba(255,255,255,0.4); margin-top:6px;">
+                <span>Easy</span><span>Chaos</span>
+            </div>
+        </div>
+
+        <div class="control-group" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:16px;">
+            <label style="color:var(--primary-color); font-weight:bold; font-size:11px; text-transform:uppercase;">Board Size</label>
+        </div>
+
+        <div class="control-group">
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1">
+                    <span style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:4px;">Columns</span>
+                    <input type="number" id="grid_w" value="3" min="2" max="12">
+                </div>
+                <div style="flex:1">
+                    <span style="font-size:10px; color:rgba(255,255,255,0.4); display:block; margin-bottom:4px;">Rows</span>
+                    <input type="number" id="grid_h" value="4" min="2" max="15">
+                </div>
+            </div>
+        </div>
+
+        <div class="switch-group" onclick="const c = document.getElementById('number'); c.checked = !c.checked; c.dispatchEvent(new Event('change'));">
+            <label class="switch" onclick="event.stopPropagation()">
+                <input type="checkbox" id="number" checked onchange="window.dispatchEvent(new CustomEvent('toggleNumbers', {detail: this.checked}))">
+                <span class="slider"></span>
+            </label>
+            <span style="color: white; font-weight: 500; font-size: 13px; pointer-events: none;">Show Numbers</span>
+        </div>
+
+        <button class="button" style="background: #10b981; color: white; margin-top: 10px; font-size: 16px; padding: 14px;" onclick="refreshPuzzle(); closeSidebarOnMobile();">
+            Apply & Start
+        </button>
+        
+        <input type="hidden" id="width" value="512">
+        <input type="hidden" id="height" value="640">
+        <input type="hidden" id="ratio" value="false">
+        <input type="hidden" id="time" value="0.25">
+        <input type="hidden" id="fill" checked>
+        <textarea id="style" style="display:none;">border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2);</textarea>
+    </div>
+
+    <div id="main">
+        <div id="win-overlay" style="display: none; position: absolute; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); flex-direction: column; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out;">
+            <div style="text-align: center; color: white; padding: 40px; border-radius: 32px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 30px 60px rgba(0,0,0,0.5); max-width: 90%; width: 400px; transform: scale(1); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <div style="font-size: 64px; margin-bottom: 24px;">✨</div>
+                <h1 style="font-size: 36px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Puzzle Fixed!</h1>
+                <p style="color: rgba(255,255,255,0.7); font-size: 16px; margin-bottom: 40px; line-height: 1.5; font-weight: 400;">Perfectly solved. Ready for a harder one?</p>
+                <button class="button" onclick="hideWinAndNext()" style="background: #10b981; border:none; padding:18px 32px; font-size:18px; width: 100%; font-weight: 800; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); color: white;">
+                    Next Challenge
+                </button>
+            </div>
+        </div>
+        
+        <button id="menu-btn" onclick="toggleSidebar()" style="position: fixed; top: 20px; left: 20px; z-index: 50; width: 52px; height: 52px; border-radius: 16px; background: #1e293b; color: white; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(0,0,0,0.25); cursor: pointer; transition: all 0.2s;">
+            <svg style="width:28px;height:28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </button>
+
+        <div id="fifteen"></div>
+        <div class="status-bar">
+            <span id="status-grid">Grid: 3 &times; 4</span>
+            <span id="status-size">Size: 512 &times; 640px</span>
+            <span>Status: Playing</span>
+        </div>
+    </div>
+
+    <script>
+        // Default Configuration
+        var setup = {
+            puzzle_fifteen: {
+                diff: 300,
+                size: [512, 640],
+                grid: [3, 4],
+                fill: true,
+                number: false,
+                art: {
+                    url: "https://picsum.photos/512/640?random=1",
+                    ratio: false
+                },
+                keyBoard: true,
+                gamePad: true,
+                time: 0.4,
+                style: "border-radius: 4px;"
+            }
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('menu-btn');
+            const isOpen = sidebar.classList.toggle('open');
+            if (menuBtn) {
+                menuBtn.style.opacity = isOpen ? '0' : '1';
+                menuBtn.style.pointerEvents = isOpen ? 'none' : 'all';
+            }
+        }
+
+        function closeSidebarOnMobile() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+        const fileInput = document.getElementById('file-input');
+        const fifteen = document.getElementById('fifteen');
+
+        // File Loading
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Update setup
+                    setup.puzzle_fifteen.art.url = e.target.result;
+                    setup.puzzle_fifteen.size = [img.width, img.height];
+                    
+                    // Auto-calculate reasonable grid (default 3x4 scaling)
+                    const aspect = img.width / img.height;
+                    let gw = 3;
+                    let gh = Math.round(3 / aspect);
+                    if (gh < 2) gh = 2;
+
+                    setup.puzzle_fifteen.grid = [gw, gh];
+
+                    // Update UI inputs
+                    document.getElementById('width').value = img.width;
+                    document.getElementById('height').value = img.height;
+                    document.getElementById('grid_w').value = gw;
+                    document.getElementById('grid_h').value = gh;
+
+                    document.getElementById('status-size').innerHTML = `Size: ${img.width} &times; ${img.height}px`;
+                    document.getElementById('status-grid').innerHTML = `Grid: ${gw} &times; ${gh}`;
+
+                    refreshPuzzle();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Drag and Drop
+        window.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        window.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        window.addEventListener('puzzleWin', () => {
+            document.getElementById('win-overlay').style.display = 'flex';
+        });
+
+        function hideWinAndNext() {
+            document.getElementById('win-overlay').style.display = 'none';
+            // Increase chaos slightly for next level or just refresh
+            let diffInput = document.getElementById('diff');
+            let currentDiff = parseInt(diffInput.value);
+            if (currentDiff < 600) {
+                diffInput.value = Math.min(600, currentDiff + 50);
+            }
+            refreshPuzzle();
+        }
+
+        function refreshPuzzle() {
+            // Collect UI values
+            setup.puzzle_fifteen.diff = parseInt(document.getElementById('diff').value);
+            setup.puzzle_fifteen.grid = [
+                parseInt(document.getElementById('grid_w').value),
+                parseInt(document.getElementById('grid_h').value)
+            ];
+            setup.puzzle_fifteen.number = document.getElementById('number').checked;
+            setup.puzzle_fifteen.time = parseFloat(document.getElementById('time').value) || 0.4;
+            
+            // Safe defaults
+            setup.puzzle_fifteen.fill = true;
+            setup.puzzle_fifteen.style = "border-radius: 8px; box-shadow: inset 0 0 4px rgba(0,0,0,0.2);";
+
+            document.getElementById('status-size').innerHTML = `Size: ${setup.puzzle_fifteen.size[0]} &times; ${setup.puzzle_fifteen.size[1]}px`;
+            document.getElementById('status-grid').innerHTML = `Grid: ${setup.puzzle_fifteen.grid[0]} &times; ${setup.puzzle_fifteen.grid[1]}`;
+
+            // Clear and reload engine
+            if (window.ceation_slots) {
+                window.ceation_slots();
+            } else {
+                const script = document.createElement('script');
+                script.src = 'fifteen_puzzle.js';
+                document.body.appendChild(script);
+            }
+        }
+
+        // Initial load
+        window.onload = refreshPuzzle;
+    </script>
+</body>
+</html>

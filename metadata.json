@@ -1,0 +1,6 @@
+{
+  "name": "Fifteen Puzzle Maker",
+  "description": "A browser-based Fifteen Sliding Puzzle game with an interactive editor and HTML export capability.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
