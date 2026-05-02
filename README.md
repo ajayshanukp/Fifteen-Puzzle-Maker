@@ -1,5 +1,7 @@
 # 🧩 Fifteen Puzzle
 
+link https://ajayshanukp.github.io/Fifteen-Puzzle-Maker/
+
 A high-performance, browser-based sliding puzzle game built with pure JavaScript and CSS. Experience a satisfying, tactile feel with custom image support, adjustable grid sizes, and relaxing sound effects.
 
 ![Status](https://img.shields.io/badge/Status-Live-brightgreen)
@@ -21,5 +23,4 @@ To run this project locally:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/fifteen-puzzle.git
-   cd fifteen-puzzle
+     https://github.com/ajayshanukp
